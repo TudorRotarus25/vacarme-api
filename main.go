@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"os"
 
 	"github.com/TudorRotarus25/vacarme-api/controllers"
 	"github.com/julienschmidt/httprouter"
@@ -16,18 +17,22 @@ func main() {
 	r := httprouter.New()
 	mongoClient := getMongoClient()
 	db := mongoClient.Database("vacarme")
-	// defer mongoClient.Disconnect(context.TODO())
 
 	pc := controllers.NewProjectController(db)
 
 	r.GET("/projects", pc.GetAllProjects)
-	r.GET("/projects/insert", pc.AddProject)
+	r.GET("/projects/:slug", pc.GetProject)
 
+	fmt.Println("Listening on port 8080")
 	http.ListenAndServe(":8080", r)
 }
 
 func getMongoClient() *mongo.Client {
-	clientOptions := options.Client().ApplyURI("mongodb://localhost:27017")
+	mongoUrl := os.Getenv("MONGO_URL")
+	mongoUsername := os.Getenv("MONGO_USER")
+	mongoPassword := os.Getenv("MONGO_PASS")
+
+	clientOptions := options.Client().ApplyURI("mongodb+srv://" + mongoUsername + ":" + mongoPassword + "@" + mongoUrl + "?retryWrites=true&w=majority")
 
 	client, err := mongo.Connect(context.TODO(), clientOptions)
 
