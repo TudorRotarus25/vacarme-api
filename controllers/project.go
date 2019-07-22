@@ -21,15 +21,17 @@ type ProjectController struct {
 
 // NewProjectController constructor
 func NewProjectController(db *mongo.Database) *ProjectController {
-	return &ProjectController{}
+	return &ProjectController{db: db}
 }
 
 // GetAllProjects list all the projects
 func (pc ProjectController) GetAllProjects(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+	w.Header().Set("Content-Type", "application/json")
+
 	collection := pc.db.Collection("projects")
 	filter := bson.D{{}}
 	findOptions := options.Find()
-	findOptions.SetLimit(2)
+	findOptions.SetLimit(500)
 
 	var results []*models.ProjectModel
 
@@ -53,15 +55,20 @@ func (pc ProjectController) GetAllProjects(w http.ResponseWriter, r *http.Reques
 		log.Fatal(err)
 	}
 
-	cur.Close(context.TODO())
-
-	jsonResults, err := json.Marshal(&results[0])
-
-	if err != nil {
-		log.Fatal(err)
+	if len(results) == 0 {
+		w.Write([]byte("[]"))
+		return
 	}
 
-	w.Header().Set("Content-Type", "application/json")
+	cur.Close(context.TODO())
+
+	jsonResults, err := json.Marshal(results)
+
+	if err != nil {
+		http.Error(w, "{\"message\":\"Error parsing result\"}", 500)
+		return
+	}
+
 	w.Write(jsonResults)
 }
 
@@ -71,15 +78,26 @@ func (pc ProjectController) GetProject(w http.ResponseWriter, r *http.Request, p
 
 	slug := params.ByName("slug")
 
-	p := models.ProjectModel{
-		Slug: slug,
-	}
+	collection := pc.db.Collection("projects")
+	filter := bson.D{{"slug", slug}}
+	findOptions := options.Find()
+	findOptions.SetLimit(500)
 
-	pj, err := json.Marshal(p)
+	var result models.ProjectModel
+
+	err := collection.FindOne(context.TODO(), filter).Decode(&result)
 
 	if err != nil {
-		log.Fatal(err)
+		http.Error(w, "{\"message\":\"Project not found\"}", 404)
+		return
 	}
 
-	w.Write(pj)
+	jsonResult, err := json.Marshal(result)
+
+	if err != nil {
+		http.Error(w, "{\"message\":\"Error parsing result\"}", 500)
+		return
+	}
+
+	w.Write(jsonResult)
 }

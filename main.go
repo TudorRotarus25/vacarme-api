@@ -28,11 +28,11 @@ func main() {
 }
 
 func getMongoClient() *mongo.Client {
-	mongoUrl := os.Getenv("MONGO_URL")
+	mongoURL := os.Getenv("MONGO_URL")
 	mongoUsername := os.Getenv("MONGO_USER")
 	mongoPassword := os.Getenv("MONGO_PASS")
 
-	clientOptions := options.Client().ApplyURI("mongodb+srv://" + mongoUsername + ":" + mongoPassword + "@" + mongoUrl + "?retryWrites=true&w=majority")
+	clientOptions := options.Client().ApplyURI("mongodb+srv://" + mongoUsername + ":" + mongoPassword + "@" + mongoURL + "?retryWrites=true&w=majority")
 
 	client, err := mongo.Connect(context.TODO(), clientOptions)
 
