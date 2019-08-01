@@ -2,7 +2,6 @@ package controllers
 
 import (
 	"context"
-	"encoding/json"
 	"log"
 	"net/http"
 
@@ -62,14 +61,9 @@ func (pc ProjectController) GetAllProjects(w http.ResponseWriter, r *http.Reques
 
 	cur.Close(context.TODO())
 
-	jsonResults, err := json.Marshal(results)
+	projects, err := models.ParseProjectsListBasicInfo(results)
 
-	if err != nil {
-		http.Error(w, "{\"message\":\"Error parsing result\"}", 500)
-		return
-	}
-
-	w.Write(jsonResults)
+	w.Write([]byte(projects))
 }
 
 // GetProject get project details
@@ -92,12 +86,12 @@ func (pc ProjectController) GetProject(w http.ResponseWriter, r *http.Request, p
 		return
 	}
 
-	jsonResult, err := json.Marshal(result)
+	projectData, err := result.ParseProjectDetails()
 
 	if err != nil {
 		http.Error(w, "{\"message\":\"Error parsing result\"}", 500)
 		return
 	}
 
-	w.Write(jsonResult)
+	w.Write(projectData)
 }
