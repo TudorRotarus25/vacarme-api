@@ -81,22 +81,18 @@ func (project *ProjectModel) ParseProjectBasicInfo() ([]byte, error) {
 
 // ParseProjectsListBasicInfo parse a list of projects to only contain basic info
 func ParseProjectsListBasicInfo(p []*ProjectModel) ([]byte, error) {
-	p0, err := p[0].ParseProjectBasicInfo()
+	projects := "["
+	separator := ""
 
-	if err != nil {
-		return nil, err
-	}
-
-	projects := "[" + string(p0)
-
-	for i := 1; i < len(p); i++ {
-		np, err := p[i].ParseProjectBasicInfo()
+	for _, cur := range p {
+		np, err := cur.ParseProjectBasicInfo()
 
 		if err != nil {
 			return nil, err
 		}
 
-		projects += "," + string(np)
+		projects += separator + string(np)
+		separator = ","
 	}
 
 	projects += "]"
