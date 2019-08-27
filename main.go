@@ -15,17 +15,7 @@ import (
 )
 
 func getMongoConnectionString() string {
-	env := os.Getenv("GO_ENV")
-
-	if env == "dev" {
-		return "mongodb://localhost:27017/"
-	}
-
-	mongoURL := os.Getenv("MONGO_URL")
-	mongoUsername := os.Getenv("MONGO_USER")
-	mongoPassword := os.Getenv("MONGO_PASS")
-
-	return "mongodb+srv://" + mongoUsername + ":" + mongoPassword + "@" + mongoURL + "?retryWrites=true&w=majority"
+	return os.Getenv("MONGO_URL")
 }
 
 func getMongoClient() *mongo.Client {
