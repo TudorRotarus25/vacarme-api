@@ -2,19 +2,20 @@ package models
 
 import (
 	"encoding/json"
+	"strings"
 )
 
 // ProjectModel mongo model for projects
 type ProjectModel struct {
-	Order          int16    `json:"order" bson:"order"`
+	Order          int      `json:"order" bson:"order"`
 	Name           string   `json:"name" bson:"name"`
 	Slug           string   `json:"slug" bson:"slug"`
 	Project        string   `json:"project" bson:"project"`
 	Domain         string   `json:"domain" bson:"domain"`
-	Year           int16    `json:"year" bson:"year"`
+	Year           int      `json:"year" bson:"year"`
 	Client         string   `json:"client" bson:"client"`
 	Layout         string   `json:"layout" bson:"layout"`
-	TaglineAngle   int16    `json:"taglineAngle" bson:"taglineAngle"`
+	TaglineAngle   int      `json:"taglineAngle" bson:"taglineAngle"`
 	TaglineTop     string   `json:"taglineTop" bson:"taglineTop"`
 	TaglineBottom  string   `json:"taglineBottom" bson:"taglineBottom"`
 	Width          float32  `json:"width" bson:"width"`
@@ -31,7 +32,7 @@ func (project *ProjectModel) ParseProjectDetails() ([]byte, error) {
 		Name       string   `json:"name"`
 		Project    string   `json:"project"`
 		Domain     string   `json:"domain"`
-		Year       int16    `json:"year"`
+		Year       int      `json:"year"`
 		Client     string   `json:"client"`
 		Paragraphs []string `json:"paragraphs"`
 	}
@@ -53,7 +54,7 @@ func (project *ProjectModel) ParseProjectBasicInfo() ([]byte, error) {
 	type responseType struct {
 		Slug           string  `json:"slug"`
 		Layout         string  `json:"layout"`
-		TaglineAngle   int16   `json:"taglineAngle"`
+		TaglineAngle   int     `json:"taglineAngle"`
 		TaglineTop     string  `json:"taglineTop"`
 		TaglineBottom  string  `json:"taglineBottom"`
 		Width          float32 `json:"width"`
@@ -81,21 +82,19 @@ func (project *ProjectModel) ParseProjectBasicInfo() ([]byte, error) {
 
 // ParseProjectsListBasicInfo parse a list of projects to only contain basic info
 func ParseProjectsListBasicInfo(p []*ProjectModel) ([]byte, error) {
-	projects := "["
-	separator := ""
+	var parsedProjects []string
 
 	for _, cur := range p {
-		np, err := cur.ParseProjectBasicInfo()
+		pp, err := cur.ParseProjectBasicInfo()
 
 		if err != nil {
 			return nil, err
 		}
 
-		projects += separator + string(np)
-		separator = ","
+		parsedProjects = append(parsedProjects, string(pp))
 	}
 
-	projects += "]"
+	projects := "[" + strings.Join(parsedProjects, ",") + "]"
 
 	return []byte(projects), nil
 }

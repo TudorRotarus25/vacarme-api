@@ -7,14 +7,15 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/TudorRotarus25/vacarme-api/controllers"
 	"github.com/julienschmidt/httprouter"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
+
+	"github.com/TudorRotarus25/vacarme-api/controllers"
 )
 
 func getMongoConnectionString() string {
-	env := os.Getenv("ENVIRONMENT")
+	env := os.Getenv("GO_ENV")
 
 	if env == "dev" {
 		return "mongodb://localhost:27017/"

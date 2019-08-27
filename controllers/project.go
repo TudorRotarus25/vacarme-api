@@ -23,10 +23,18 @@ func NewProjectController(db *mongo.Database) *ProjectController {
 	return &ProjectController{db: db}
 }
 
+func sendResponse(w http.ResponseWriter, response []byte) {
+	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+	_, err := w.Write(response)
+
+	if err != nil {
+		log.Fatal(err)
+	}
+}
+
 // GetAllProjects list all the projects
 func (pc ProjectController) GetAllProjects(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
-	w.Header().Set("Content-Type", "application/json")
-
 	collection := pc.db.Collection("projects")
 	filter := bson.D{{}}
 	findOptions := options.Find()
@@ -55,21 +63,22 @@ func (pc ProjectController) GetAllProjects(w http.ResponseWriter, r *http.Reques
 	}
 
 	if len(results) == 0 {
-		w.Write([]byte("[]"))
+		sendResponse(w, []byte("[]"))
 		return
 	}
 
-	cur.Close(context.TODO())
+	err = cur.Close(context.TODO())
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	projects, err := models.ParseProjectsListBasicInfo(results)
 
-	w.Write([]byte(projects))
+	sendResponse(w, projects)
 }
 
 // GetProject get project details
 func (pc ProjectController) GetProject(w http.ResponseWriter, r *http.Request, params httprouter.Params) {
-	w.Header().Set("Content-Type", "application/json")
-
 	slug := params.ByName("slug")
 
 	collection := pc.db.Collection("projects")
@@ -93,5 +102,5 @@ func (pc ProjectController) GetProject(w http.ResponseWriter, r *http.Request, p
 		return
 	}
 
-	w.Write(projectData)
+	sendResponse(w, projectData)
 }
