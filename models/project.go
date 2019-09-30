@@ -5,6 +5,12 @@ import (
 	"strings"
 )
 
+// Video type
+type Video struct {
+	Src         string `json:"src" bson:"src"`
+	Orientation string `json:"orientation" bson:"orientation"`
+}
+
 // ProjectModel mongo model for projects
 type ProjectModel struct {
 	Order                int      `json:"order" bson:"order"`
@@ -28,6 +34,7 @@ type ProjectModel struct {
 	ProjectImagesPreset  int      `json:"projectImagesPreset" bson:"projectImagesPreset"`
 	ProjectDesktopImages []string `json:"projectDesktopImages" bson:"projectDesktopImages"`
 	ProjectMobileImages  []string `json:"projectMobileImages" bson:"projectMobileImages"`
+	ProjectVideos        []Video  `json:"projectVideos" bson:"projectVideos"`
 }
 
 // ParseProjectDetails parse project leaving only the details
@@ -42,6 +49,7 @@ func (project *ProjectModel) ParseProjectDetails() ([]byte, error) {
 		ProjectImagesPreset  int      `json:"projectImagesPreset"`
 		ProjectDesktopImages []string `json:"projectDesktopImages"`
 		ProjectMobileImages  []string `json:"projectMobileImages"`
+		ProjectVideos        []Video  `json:"projectVideos"`
 	}
 
 	response := responseType{
@@ -54,6 +62,7 @@ func (project *ProjectModel) ParseProjectDetails() ([]byte, error) {
 		ProjectImagesPreset:  project.ProjectImagesPreset,
 		ProjectDesktopImages: project.ProjectDesktopImages,
 		ProjectMobileImages:  project.ProjectMobileImages,
+		ProjectVideos:        project.ProjectVideos,
 	}
 
 	return json.Marshal(response)
