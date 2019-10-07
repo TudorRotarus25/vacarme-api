@@ -35,6 +35,8 @@ type ProjectModel struct {
 	ProjectDesktopImages []string `json:"projectDesktopImages" bson:"projectDesktopImages"`
 	ProjectMobileImages  []string `json:"projectMobileImages" bson:"projectMobileImages"`
 	ProjectVideos        []Video  `json:"projectVideos" bson:"projectVideos"`
+	DarkMode             bool     `json:"darkMode" bson:"darkMode"`
+	TaglineDarkMode      bool     `json:"taglineDarkMode" bson:"taglineDarkMode"`
 }
 
 // ParseProjectDetails parse project leaving only the details
@@ -50,6 +52,7 @@ func (project *ProjectModel) ParseProjectDetails() ([]byte, error) {
 		ProjectDesktopImages []string `json:"projectDesktopImages"`
 		ProjectMobileImages  []string `json:"projectMobileImages"`
 		ProjectVideos        []Video  `json:"projectVideos"`
+		DarkMode             bool     `json:"darkMode"`
 	}
 
 	response := responseType{
@@ -63,6 +66,7 @@ func (project *ProjectModel) ParseProjectDetails() ([]byte, error) {
 		ProjectDesktopImages: project.ProjectDesktopImages,
 		ProjectMobileImages:  project.ProjectMobileImages,
 		ProjectVideos:        project.ProjectVideos,
+		DarkMode:             project.DarkMode,
 	}
 
 	return json.Marshal(response)
@@ -71,31 +75,33 @@ func (project *ProjectModel) ParseProjectDetails() ([]byte, error) {
 // ParseProjectBasicInfo parse project leaving only basic info
 func (project *ProjectModel) ParseProjectBasicInfo() ([]byte, error) {
 	type responseType struct {
-		Slug           string  `json:"slug"`
-		Layout         string  `json:"layout"`
-		TaglineAngle   int     `json:"taglineAngle"`
-		TaglineTop     string  `json:"taglineTop"`
-		TaglineBottom  string  `json:"taglineBottom"`
-		Width          float32 `json:"width"`
-		ShapeURL       string  `json:"shapeUrl"`
-		HoverImageURL  string  `json:"hoverImageUrl"`
-		MobileImageURL string  `json:"mobileImageUrl"`
-		Color          string  `json:"color"`
-		Cta            string  `json:"cta"`
+		Slug            string  `json:"slug"`
+		Layout          string  `json:"layout"`
+		TaglineAngle    int     `json:"taglineAngle"`
+		TaglineTop      string  `json:"taglineTop"`
+		TaglineBottom   string  `json:"taglineBottom"`
+		Width           float32 `json:"width"`
+		ShapeURL        string  `json:"shapeUrl"`
+		HoverImageURL   string  `json:"hoverImageUrl"`
+		MobileImageURL  string  `json:"mobileImageUrl"`
+		Color           string  `json:"color"`
+		Cta             string  `json:"cta"`
+		TaglineDarkMode bool    `json:"taglineDarkMode"`
 	}
 
 	response := responseType{
-		Slug:           project.Slug,
-		Layout:         project.Layout,
-		TaglineAngle:   project.TaglineAngle,
-		TaglineTop:     project.TaglineTop,
-		TaglineBottom:  project.TaglineBottom,
-		Width:          project.Width,
-		ShapeURL:       project.ShapeURL,
-		HoverImageURL:  project.HoverImageURL,
-		MobileImageURL: project.MobileImageURL,
-		Color:          project.Color,
-		Cta:            project.Cta,
+		Slug:            project.Slug,
+		Layout:          project.Layout,
+		TaglineAngle:    project.TaglineAngle,
+		TaglineTop:      project.TaglineTop,
+		TaglineBottom:   project.TaglineBottom,
+		Width:           project.Width,
+		ShapeURL:        project.ShapeURL,
+		HoverImageURL:   project.HoverImageURL,
+		MobileImageURL:  project.MobileImageURL,
+		Color:           project.Color,
+		Cta:             project.Cta,
+		TaglineDarkMode: project.TaglineDarkMode,
 	}
 
 	return json.Marshal(response)
