@@ -39,6 +39,7 @@ func (pc ProjectController) GetAllProjects(w http.ResponseWriter, r *http.Reques
 	filter := bson.D{{}}
 	findOptions := options.Find()
 	findOptions.SetLimit(500)
+	findOptions.SetSort(bson.D{{"order", 1}})
 
 	var results []*models.ProjectModel
 
