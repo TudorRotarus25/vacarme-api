@@ -68,10 +68,7 @@ func (pc ProjectController) GetAllProjects(w http.ResponseWriter, r *http.Reques
 		return
 	}
 
-	err = cur.Close(context.TODO())
-	if err != nil {
-		log.Fatal(err)
-	}
+	cur.Close(context.TODO())
 
 	projects, err := models.ParseProjectsListBasicInfo(results)
 
