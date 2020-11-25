@@ -37,6 +37,8 @@ type ProjectModel struct {
 	ProjectVideos        []Video  `json:"projectVideos" bson:"projectVideos"`
 	DarkMode             bool     `json:"darkMode" bson:"darkMode"`
 	TaglineDarkMode      bool     `json:"taglineDarkMode" bson:"taglineDarkMode"`
+	MetaTitle            string   `json:"metaTitle" bson:"metaTitle"`
+	MetaDescription      string   `json:"metaDescription" bson:"metaDescription"`
 }
 
 // ParseProjectDetails parse project leaving only the details
@@ -53,6 +55,8 @@ func (project *ProjectModel) ParseProjectDetails() ([]byte, error) {
 		ProjectMobileImages  []string `json:"projectMobileImages"`
 		ProjectVideos        []Video  `json:"projectVideos"`
 		DarkMode             bool     `json:"darkMode"`
+		MetaTitle            string   `json:"metaTitle"`
+		MetaDescription      string   `json:"metaDescription"`
 	}
 
 	response := responseType{
@@ -67,6 +71,8 @@ func (project *ProjectModel) ParseProjectDetails() ([]byte, error) {
 		ProjectMobileImages:  project.ProjectMobileImages,
 		ProjectVideos:        project.ProjectVideos,
 		DarkMode:             project.DarkMode,
+		MetaTitle:            project.MetaTitle,
+		MetaDescription:      project.MetaDescription,
 	}
 
 	return json.Marshal(response)
