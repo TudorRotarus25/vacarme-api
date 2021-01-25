@@ -31,6 +31,7 @@ type ProjectModel struct {
 	Color                string   `json:"color" bson:"color"`
 	Cta                  string   `json:"cta" bson:"cta"`
 	Paragraphs           []string `json:"paragraphs" bson:"paragraphs"`
+	URL                  string   `json:"url" bson:"url"`
 	ProjectImagesPreset  int      `json:"projectImagesPreset" bson:"projectImagesPreset"`
 	ProjectDesktopImages []string `json:"projectDesktopImages" bson:"projectDesktopImages"`
 	ProjectMobileImages  []string `json:"projectMobileImages" bson:"projectMobileImages"`
@@ -50,6 +51,7 @@ func (project *ProjectModel) ParseProjectDetails() ([]byte, error) {
 		Year                 int      `json:"year"`
 		Client               string   `json:"client"`
 		Paragraphs           []string `json:"paragraphs"`
+		URL                  string   `json:"url"`
 		ProjectImagesPreset  int      `json:"projectImagesPreset"`
 		ProjectDesktopImages []string `json:"projectDesktopImages"`
 		ProjectMobileImages  []string `json:"projectMobileImages"`
@@ -66,6 +68,7 @@ func (project *ProjectModel) ParseProjectDetails() ([]byte, error) {
 		Year:                 project.Year,
 		Client:               project.Client,
 		Paragraphs:           project.Paragraphs,
+		URL:                  project.URL,
 		ProjectImagesPreset:  project.ProjectImagesPreset,
 		ProjectDesktopImages: project.ProjectDesktopImages,
 		ProjectMobileImages:  project.ProjectMobileImages,
@@ -81,6 +84,7 @@ func (project *ProjectModel) ParseProjectDetails() ([]byte, error) {
 // ParseProjectBasicInfo parse project leaving only basic info
 func (project *ProjectModel) ParseProjectBasicInfo() ([]byte, error) {
 	type responseType struct {
+		Name            string  `json:"name"`
 		Slug            string  `json:"slug"`
 		Layout          string  `json:"layout"`
 		TaglineAngle    int     `json:"taglineAngle"`
@@ -96,6 +100,7 @@ func (project *ProjectModel) ParseProjectBasicInfo() ([]byte, error) {
 	}
 
 	response := responseType{
+		Name:            project.Name,
 		Slug:            project.Slug,
 		Layout:          project.Layout,
 		TaglineAngle:    project.TaglineAngle,
