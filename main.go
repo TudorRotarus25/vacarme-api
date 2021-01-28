@@ -47,6 +47,7 @@ func main() {
 
 	r.GET("/projects", pc.GetAllProjects)
 	r.GET("/projects/:slug", pc.GetProject)
+	r.GET("/categories", pc.GetAllCategories)
 
 	fmt.Println("Listening on port 8080")
 	http.ListenAndServe(":8080", r)

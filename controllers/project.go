@@ -33,6 +33,48 @@ func sendResponse(w http.ResponseWriter, response []byte) {
 	}
 }
 
+// GetAllCategories return all the categories sorted by `order`
+func (pc ProjectController) GetAllCategories(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+	collection := pc.db.Collection("categories")
+	filter := bson.D{{}}
+	findOptions := options.Find()
+	findOptions.SetLimit(500)
+	findOptions.SetSort(bson.D{{"order", 1}})
+
+	var results []*models.CategoryModel
+
+	cur, err := collection.Find(context.TODO(), filter, findOptions)
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	for cur.Next(context.TODO()) {
+		var elem models.CategoryModel
+		err := cur.Decode(&elem)
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		results = append(results, &elem)
+	}
+
+	if err := cur.Err(); err != nil {
+		log.Fatal(err)
+	}
+
+	if len(results) == 0 {
+		sendResponse(w, []byte("[]"))
+		return
+	}
+
+	cur.Close(context.TODO())
+
+	categories, err := models.ParseCategories(results)
+
+	sendResponse(w, categories)
+}
+
 // GetAllProjects list all the projects
 func (pc ProjectController) GetAllProjects(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	collection := pc.db.Collection("projects")
