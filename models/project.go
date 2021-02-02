@@ -2,6 +2,7 @@ package models
 
 import (
 	"encoding/json"
+	"sort"
 	"strings"
 )
 
@@ -9,6 +10,14 @@ import (
 type Video struct {
 	Src         string `json:"src" bson:"src"`
 	Orientation string `json:"orientation" bson:"orientation"`
+}
+
+// Media type
+type Media struct {
+	Type        string `json:"type" bson:"type"`
+	Src         string `json:"src" bson:"src"`
+	Orientation string `json:"orientation" bson:"orientation"`
+	Order       int    `json:"order" bson:"order"`
 }
 
 // ProjectModel mongo model for projects
@@ -36,10 +45,20 @@ type ProjectModel struct {
 	ProjectDesktopImages []string `json:"projectDesktopImages" bson:"projectDesktopImages"`
 	ProjectMobileImages  []string `json:"projectMobileImages" bson:"projectMobileImages"`
 	ProjectVideos        []Video  `json:"projectVideos" bson:"projectVideos"`
+	ProjectDesktopMedia  []Media  `json:"projectDesktopMedia" bson:"projectDesktopMedia"`
+	ProjectMobileMedia   []Media  `json:"projectMobileMedia" bson:"projectMobileMedia"`
 	DarkMode             bool     `json:"darkMode" bson:"darkMode"`
 	TaglineDarkMode      bool     `json:"taglineDarkMode" bson:"taglineDarkMode"`
 	MetaTitle            string   `json:"metaTitle" bson:"metaTitle"`
 	MetaDescription      string   `json:"metaDescription" bson:"metaDescription"`
+}
+
+func sortMediaItems(items []Media) []Media {
+	sort.SliceStable(items, func(i, j int) bool {
+		return items[i].Order < items[j].Order
+	})
+
+	return items
 }
 
 // ParseProjectDetails parse project leaving only the details
@@ -56,6 +75,8 @@ func (project *ProjectModel) ParseProjectDetails() ([]byte, error) {
 		ProjectDesktopImages []string `json:"projectDesktopImages"`
 		ProjectMobileImages  []string `json:"projectMobileImages"`
 		ProjectVideos        []Video  `json:"projectVideos"`
+		ProjectDesktopMedia  []Media  `json:"projectDesktopMedia"`
+		ProjectMobileMedia   []Media  `json:"projectMobileMedia"`
 		DarkMode             bool     `json:"darkMode"`
 		MetaTitle            string   `json:"metaTitle"`
 		MetaDescription      string   `json:"metaDescription"`
@@ -73,6 +94,8 @@ func (project *ProjectModel) ParseProjectDetails() ([]byte, error) {
 		ProjectDesktopImages: project.ProjectDesktopImages,
 		ProjectMobileImages:  project.ProjectMobileImages,
 		ProjectVideos:        project.ProjectVideos,
+		ProjectDesktopMedia:  sortMediaItems(project.ProjectDesktopMedia),
+		ProjectMobileMedia:   sortMediaItems(project.ProjectMobileMedia),
 		DarkMode:             project.DarkMode,
 		MetaTitle:            project.MetaTitle,
 		MetaDescription:      project.MetaDescription,
