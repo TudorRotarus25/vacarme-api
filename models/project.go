@@ -6,12 +6,6 @@ import (
 	"strings"
 )
 
-// Video type
-type Video struct {
-	Src         string `json:"src" bson:"src"`
-	Orientation string `json:"orientation" bson:"orientation"`
-}
-
 // Media type
 type Media struct {
 	Type        string `json:"type" bson:"type"`
@@ -42,10 +36,6 @@ type ProjectModel struct {
 	Cta                  string   `json:"cta" bson:"cta"`
 	Paragraphs           []string `json:"paragraphs" bson:"paragraphs"`
 	URL                  string   `json:"url" bson:"url"`
-	ProjectImagesPreset  int      `json:"projectImagesPreset" bson:"projectImagesPreset"`
-	ProjectDesktopImages []string `json:"projectDesktopImages" bson:"projectDesktopImages"`
-	ProjectMobileImages  []string `json:"projectMobileImages" bson:"projectMobileImages"`
-	ProjectVideos        []Video  `json:"projectVideos" bson:"projectVideos"`
 	ProjectDesktopMedia  []Media  `json:"projectDesktopMedia" bson:"projectDesktopMedia"`
 	ProjectMobileMedia   []Media  `json:"projectMobileMedia" bson:"projectMobileMedia"`
 	DarkMode             bool     `json:"darkMode" bson:"darkMode"`
@@ -65,41 +55,33 @@ func sortMediaItems(items []Media) []Media {
 // ParseProjectDetails parse project leaving only the details
 func (project *ProjectModel) ParseProjectDetails() ([]byte, error) {
 	type responseType struct {
-		Name                 string   `json:"name"`
-		Project              string   `json:"project"`
-		Domain               string   `json:"domain"`
-		Year                 int      `json:"year"`
-		Client               string   `json:"client"`
-		Paragraphs           []string `json:"paragraphs"`
-		URL                  string   `json:"url"`
-		ProjectImagesPreset  int      `json:"projectImagesPreset"`
-		ProjectDesktopImages []string `json:"projectDesktopImages"`
-		ProjectMobileImages  []string `json:"projectMobileImages"`
-		ProjectVideos        []Video  `json:"projectVideos"`
-		ProjectDesktopMedia  []Media  `json:"projectDesktopMedia"`
-		ProjectMobileMedia   []Media  `json:"projectMobileMedia"`
-		DarkMode             bool     `json:"darkMode"`
-		MetaTitle            string   `json:"metaTitle"`
-		MetaDescription      string   `json:"metaDescription"`
+		Name                string   `json:"name"`
+		Project             string   `json:"project"`
+		Domain              string   `json:"domain"`
+		Year                int      `json:"year"`
+		Client              string   `json:"client"`
+		Paragraphs          []string `json:"paragraphs"`
+		URL                 string   `json:"url"`
+		ProjectDesktopMedia []Media  `json:"projectDesktopMedia"`
+		ProjectMobileMedia  []Media  `json:"projectMobileMedia"`
+		DarkMode            bool     `json:"darkMode"`
+		MetaTitle           string   `json:"metaTitle"`
+		MetaDescription     string   `json:"metaDescription"`
 	}
 
 	response := responseType{
-		Name:                 project.Name,
-		Project:              project.Project,
-		Domain:               project.Domain,
-		Year:                 project.Year,
-		Client:               project.Client,
-		Paragraphs:           project.Paragraphs,
-		URL:                  project.URL,
-		ProjectImagesPreset:  project.ProjectImagesPreset,
-		ProjectDesktopImages: project.ProjectDesktopImages,
-		ProjectMobileImages:  project.ProjectMobileImages,
-		ProjectVideos:        project.ProjectVideos,
-		ProjectDesktopMedia:  sortMediaItems(project.ProjectDesktopMedia),
-		ProjectMobileMedia:   sortMediaItems(project.ProjectMobileMedia),
-		DarkMode:             project.DarkMode,
-		MetaTitle:            project.MetaTitle,
-		MetaDescription:      project.MetaDescription,
+		Name:                project.Name,
+		Project:             project.Project,
+		Domain:              project.Domain,
+		Year:                project.Year,
+		Client:              project.Client,
+		Paragraphs:          project.Paragraphs,
+		URL:                 project.URL,
+		ProjectDesktopMedia: sortMediaItems(project.ProjectDesktopMedia),
+		ProjectMobileMedia:  sortMediaItems(project.ProjectMobileMedia),
+		DarkMode:            project.DarkMode,
+		MetaTitle:           project.MetaTitle,
+		MetaDescription:     project.MetaDescription,
 	}
 
 	return json.Marshal(response)
