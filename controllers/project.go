@@ -24,6 +24,8 @@ func (pc ProjectController) GetAllCategories(c *gin.Context) {
 	findOptions.SetLimit(500)
 	findOptions.SetSort(bson.D{{"order", 1}})
 
+	c.Header("Access-Control-Allow-Origin", "*")
+
 	var results []*models.CategoryModel
 
 	cur, err := collection.Find(context.TODO(), filter, findOptions)
@@ -60,6 +62,8 @@ func (pc ProjectController) GetAllProjects(c *gin.Context) {
 	findOptions.SetLimit(500)
 	findOptions.SetSort(bson.D{{"order", 1}})
 
+	c.Header("Access-Control-Allow-Origin", "*")
+
 	var results []*models.ProjectModel
 
 	cur, err := collection.Find(context.TODO(), filter, findOptions)
@@ -95,6 +99,8 @@ func (pc ProjectController) GetProject(c *gin.Context) {
 	filter := bson.D{{"slug", slug}}
 	findOptions := options.Find()
 	findOptions.SetLimit(500)
+
+	c.Header("Access-Control-Allow-Origin", "*")
 
 	var result models.ProjectModel
 
