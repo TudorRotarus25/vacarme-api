@@ -2,15 +2,11 @@ package controllers
 
 import (
 	"context"
-	"log"
-	"net/http"
-
+	"github.com/TudorRotarus25/vacarme-api/models"
+	"github.com/gin-gonic/gin"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
-
-	"github.com/TudorRotarus25/vacarme-api/models"
-	"github.com/julienschmidt/httprouter"
 )
 
 // ProjectController struct
@@ -23,18 +19,8 @@ func NewProjectController(db *mongo.Database) *ProjectController {
 	return &ProjectController{db: db}
 }
 
-func sendResponse(w http.ResponseWriter, response []byte) {
-	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("Access-Control-Allow-Origin", "*")
-	_, err := w.Write(response)
-
-	if err != nil {
-		log.Fatal(err)
-	}
-}
-
 // GetAllCategories return all the categories sorted by `order`
-func (pc ProjectController) GetAllCategories(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+func (pc ProjectController) GetAllCategories(c *gin.Context) {
 	collection := pc.db.Collection("categories")
 	filter := bson.D{{}}
 	findOptions := options.Find()
@@ -46,37 +32,32 @@ func (pc ProjectController) GetAllCategories(w http.ResponseWriter, r *http.Requ
 	cur, err := collection.Find(context.TODO(), filter, findOptions)
 
 	if err != nil {
-		log.Fatal(err)
+		print("Failed to load the categories collection")
+		c.JSON(500, gin.H{"error": "Failed to load the categories collection"})
+		return
 	}
+
+	defer cur.Close(context.TODO())
 
 	for cur.Next(context.TODO()) {
 		var elem models.CategoryModel
+
 		err := cur.Decode(&elem)
 		if err != nil {
-			log.Fatal(err)
+			print("Failed to parse collection item")
+			continue
 		}
 
 		results = append(results, &elem)
 	}
 
-	if err := cur.Err(); err != nil {
-		log.Fatal(err)
-	}
+	categories := models.ParseCategories(results)
 
-	if len(results) == 0 {
-		sendResponse(w, []byte("[]"))
-		return
-	}
-
-	cur.Close(context.TODO())
-
-	categories, err := models.ParseCategories(results)
-
-	sendResponse(w, categories)
+	c.JSON(200, gin.H{"data": categories})
 }
 
 // GetAllProjects list all the projects
-func (pc ProjectController) GetAllProjects(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+func (pc ProjectController) GetAllProjects(c *gin.Context) {
 	collection := pc.db.Collection("projects")
 	filter := bson.D{{}}
 	findOptions := options.Find()
@@ -88,38 +69,32 @@ func (pc ProjectController) GetAllProjects(w http.ResponseWriter, r *http.Reques
 	cur, err := collection.Find(context.TODO(), filter, findOptions)
 
 	if err != nil {
-		log.Fatal(err)
+		print("Failed to load the projects collection")
+		c.JSON(500, gin.H{"error": "Failed to load the projects collection"})
+		return
 	}
+
+	defer cur.Close(context.TODO())
 
 	for cur.Next(context.TODO()) {
 		var elem models.ProjectModel
 		err := cur.Decode(&elem)
 		if err != nil {
-			log.Fatal(err)
+			print("Failed to parse collection item")
+			continue
 		}
 
 		results = append(results, &elem)
 	}
 
-	if err := cur.Err(); err != nil {
-		log.Fatal(err)
-	}
+	projects := models.ParseProjectsListBasicInfo(results)
 
-	if len(results) == 0 {
-		sendResponse(w, []byte("[]"))
-		return
-	}
-
-	cur.Close(context.TODO())
-
-	projects, err := models.ParseProjectsListBasicInfo(results)
-
-	sendResponse(w, projects)
+	c.JSON(200, gin.H{"data": projects})
 }
 
 // GetProject get project details
-func (pc ProjectController) GetProject(w http.ResponseWriter, r *http.Request, params httprouter.Params) {
-	slug := params.ByName("slug")
+func (pc ProjectController) GetProject(c *gin.Context) {
+	slug := c.Param("slug")
 
 	collection := pc.db.Collection("projects")
 	filter := bson.D{{"slug", slug}}
@@ -131,16 +106,11 @@ func (pc ProjectController) GetProject(w http.ResponseWriter, r *http.Request, p
 	err := collection.FindOne(context.TODO(), filter).Decode(&result)
 
 	if err != nil {
-		http.Error(w, "{\"message\":\"Project not found\"}", 404)
+		c.JSON(404, gin.H{"error": "Project not found"})
 		return
 	}
 
-	projectData, err := result.ParseProjectDetails()
+	projectData := result.ParseProjectDetails()
 
-	if err != nil {
-		http.Error(w, "{\"message\":\"Error parsing result\"}", 500)
-		return
-	}
-
-	sendResponse(w, projectData)
+	c.JSON(200, gin.H{"data": projectData})
 }

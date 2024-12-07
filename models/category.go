@@ -1,9 +1,6 @@
 package models
 
-import (
-	"encoding/json"
-	"strings"
-)
+import "strings"
 
 // CategoryModel mongo model for categories
 type CategoryModel struct {
@@ -11,34 +8,28 @@ type CategoryModel struct {
 	Order int    `json:"order" bson:"order"`
 }
 
-// ParseCategory parse category
-func (c *CategoryModel) ParseCategory() ([]byte, error) {
-	type responseType struct {
-		Name string `json:"name"`
-	}
+type CategoryResponse struct {
+	Name string `json:"name"`
+}
 
-	response := responseType{
+// ParseCategory parse category
+func (c *CategoryModel) ParseCategory() *CategoryResponse {
+	response := CategoryResponse{
 		Name: strings.ToLower(c.Name),
 	}
 
-	return json.Marshal(response)
+	return &response
 }
 
 // ParseCategories parse a list of categories
-func ParseCategories(c []*CategoryModel) ([]byte, error) {
-	var categories []string
+func ParseCategories(c []*CategoryModel) []*CategoryResponse {
+	var categories []*CategoryResponse
 
 	for _, cur := range c {
-		pp, err := cur.ParseCategory()
+		pp := cur.ParseCategory()
 
-		if err != nil {
-			return nil, err
-		}
-
-		categories = append(categories, string(pp))
+		categories = append(categories, pp)
 	}
 
-	projects := "[" + strings.Join(categories, ",") + "]"
-
-	return []byte(projects), nil
+	return categories
 }

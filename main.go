@@ -3,11 +3,11 @@ package main
 import (
 	"context"
 	"fmt"
+	"github.com/gin-gonic/gin"
+	"github.com/joho/godotenv"
 	"log"
-	"net/http"
 	"os"
 
-	"github.com/julienschmidt/httprouter"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 
@@ -39,7 +39,9 @@ func getMongoClient() *mongo.Client {
 }
 
 func main() {
-	r := httprouter.New()
+	godotenv.Load()
+
+	r := gin.Default()
 	mongoClient := getMongoClient()
 	db := mongoClient.Database("vacarme")
 
@@ -50,5 +52,10 @@ func main() {
 	r.GET("/categories", pc.GetAllCategories)
 
 	fmt.Println("Listening on port 8080")
-	http.ListenAndServe(":8080", r)
+
+	err := r.Run()
+
+	if err != nil {
+		log.Fatal(err)
+	}
 }

@@ -1,9 +1,7 @@
 package models
 
 import (
-	"encoding/json"
 	"sort"
-	"strings"
 )
 
 // Media type
@@ -44,6 +42,38 @@ type ProjectModel struct {
 	MetaDescription      string   `json:"metaDescription" bson:"metaDescription"`
 }
 
+type ProjectBasicInfoResponse struct {
+	Name                 string  `json:"name"`
+	Slug                 string  `json:"slug"`
+	Layout               string  `json:"layout"`
+	TaglineAngle         int     `json:"taglineAngle"`
+	TaglineTop           string  `json:"taglineTop"`
+	TaglineBottom        string  `json:"taglineBottom"`
+	Width                float32 `json:"width"`
+	ShapeURL             string  `json:"shapeUrl"`
+	HoverImageURL        string  `json:"hoverImageUrl"`
+	ThirdOverlayImageURL string  `json:"thirdOverlayImageUrl"`
+	MobileImageURL       string  `json:"mobileImageUrl"`
+	Color                string  `json:"color"`
+	Cta                  string  `json:"cta"`
+	TaglineDarkMode      bool    `json:"taglineDarkMode"`
+}
+
+type ProjectDetailsResponse struct {
+	Name                string   `json:"name"`
+	Project             string   `json:"project"`
+	Domain              string   `json:"domain"`
+	Year                int      `json:"year"`
+	Client              string   `json:"client"`
+	Paragraphs          []string `json:"paragraphs"`
+	URL                 string   `json:"url"`
+	ProjectDesktopMedia []Media  `json:"projectDesktopMedia"`
+	ProjectMobileMedia  []Media  `json:"projectMobileMedia"`
+	DarkMode            bool     `json:"darkMode"`
+	MetaTitle           string   `json:"metaTitle"`
+	MetaDescription     string   `json:"metaDescription"`
+}
+
 func sortMediaItems(items []Media) []Media {
 	sort.SliceStable(items, func(i, j int) bool {
 		return items[i].Order < items[j].Order
@@ -53,23 +83,8 @@ func sortMediaItems(items []Media) []Media {
 }
 
 // ParseProjectDetails parse project leaving only the details
-func (project *ProjectModel) ParseProjectDetails() ([]byte, error) {
-	type responseType struct {
-		Name                string   `json:"name"`
-		Project             string   `json:"project"`
-		Domain              string   `json:"domain"`
-		Year                int      `json:"year"`
-		Client              string   `json:"client"`
-		Paragraphs          []string `json:"paragraphs"`
-		URL                 string   `json:"url"`
-		ProjectDesktopMedia []Media  `json:"projectDesktopMedia"`
-		ProjectMobileMedia  []Media  `json:"projectMobileMedia"`
-		DarkMode            bool     `json:"darkMode"`
-		MetaTitle           string   `json:"metaTitle"`
-		MetaDescription     string   `json:"metaDescription"`
-	}
-
-	response := responseType{
+func (project *ProjectModel) ParseProjectDetails() *ProjectDetailsResponse {
+	response := ProjectDetailsResponse{
 		Name:                project.Name,
 		Project:             project.Project,
 		Domain:              project.Domain,
@@ -84,29 +99,12 @@ func (project *ProjectModel) ParseProjectDetails() ([]byte, error) {
 		MetaDescription:     project.MetaDescription,
 	}
 
-	return json.Marshal(response)
+	return &response
 }
 
 // ParseProjectBasicInfo parse project leaving only basic info
-func (project *ProjectModel) ParseProjectBasicInfo() ([]byte, error) {
-	type responseType struct {
-		Name                 string  `json:"name"`
-		Slug                 string  `json:"slug"`
-		Layout               string  `json:"layout"`
-		TaglineAngle         int     `json:"taglineAngle"`
-		TaglineTop           string  `json:"taglineTop"`
-		TaglineBottom        string  `json:"taglineBottom"`
-		Width                float32 `json:"width"`
-		ShapeURL             string  `json:"shapeUrl"`
-		HoverImageURL        string  `json:"hoverImageUrl"`
-		ThirdOverlayImageURL string  `json:"thirdOverlayImageUrl"`
-		MobileImageURL       string  `json:"mobileImageUrl"`
-		Color                string  `json:"color"`
-		Cta                  string  `json:"cta"`
-		TaglineDarkMode      bool    `json:"taglineDarkMode"`
-	}
-
-	response := responseType{
+func (project *ProjectModel) ParseProjectBasicInfo() *ProjectBasicInfoResponse {
+	response := ProjectBasicInfoResponse{
 		Name:                 project.Name,
 		Slug:                 project.Slug,
 		Layout:               project.Layout,
@@ -123,24 +121,18 @@ func (project *ProjectModel) ParseProjectBasicInfo() ([]byte, error) {
 		TaglineDarkMode:      project.TaglineDarkMode,
 	}
 
-	return json.Marshal(response)
+	return &response
 }
 
 // ParseProjectsListBasicInfo parse a list of projects to only contain basic info
-func ParseProjectsListBasicInfo(p []*ProjectModel) ([]byte, error) {
-	var parsedProjects []string
+func ParseProjectsListBasicInfo(p []*ProjectModel) []*ProjectBasicInfoResponse {
+	var parsedProjects []*ProjectBasicInfoResponse
 
 	for _, cur := range p {
-		pp, err := cur.ParseProjectBasicInfo()
+		pp := cur.ParseProjectBasicInfo()
 
-		if err != nil {
-			return nil, err
-		}
-
-		parsedProjects = append(parsedProjects, string(pp))
+		parsedProjects = append(parsedProjects, pp)
 	}
 
-	projects := "[" + strings.Join(parsedProjects, ",") + "]"
-
-	return []byte(projects), nil
+	return parsedProjects
 }
