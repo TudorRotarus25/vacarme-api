@@ -4,7 +4,6 @@ import (
 	"sort"
 )
 
-// Media type
 type Media struct {
 	Type        string `json:"type" bson:"type"`
 	Src         string `json:"src" bson:"src"`
@@ -12,7 +11,6 @@ type Media struct {
 	Order       int    `json:"order" bson:"order"`
 }
 
-// ProjectModel mongo model for projects
 type ProjectModel struct {
 	Order                int      `json:"order" bson:"order"`
 	Name                 string   `json:"name" bson:"name"`
@@ -82,7 +80,6 @@ func sortMediaItems(items []Media) []Media {
 	return items
 }
 
-// ParseProjectDetails parse project leaving only the details
 func (project *ProjectModel) ParseProjectDetails() *ProjectDetailsResponse {
 	response := ProjectDetailsResponse{
 		Name:                project.Name,
@@ -102,7 +99,6 @@ func (project *ProjectModel) ParseProjectDetails() *ProjectDetailsResponse {
 	return &response
 }
 
-// ParseProjectBasicInfo parse project leaving only basic info
 func (project *ProjectModel) ParseProjectBasicInfo() *ProjectBasicInfoResponse {
 	response := ProjectBasicInfoResponse{
 		Name:                 project.Name,
@@ -124,7 +120,6 @@ func (project *ProjectModel) ParseProjectBasicInfo() *ProjectBasicInfoResponse {
 	return &response
 }
 
-// ParseProjectsListBasicInfo parse a list of projects to only contain basic info
 func ParseProjectsListBasicInfo(p []*ProjectModel) []*ProjectBasicInfoResponse {
 	var parsedProjects []*ProjectBasicInfoResponse
 

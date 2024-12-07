@@ -9,17 +9,14 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-// ProjectController struct
 type ProjectController struct {
 	db *mongo.Database
 }
 
-// NewProjectController constructor
 func NewProjectController(db *mongo.Database) *ProjectController {
 	return &ProjectController{db: db}
 }
 
-// GetAllCategories return all the categories sorted by `order`
 func (pc ProjectController) GetAllCategories(c *gin.Context) {
 	collection := pc.db.Collection("categories")
 	filter := bson.D{{}}
@@ -53,10 +50,9 @@ func (pc ProjectController) GetAllCategories(c *gin.Context) {
 
 	categories := models.ParseCategories(results)
 
-	c.JSON(200, gin.H{"data": categories})
+	c.JSON(200, categories)
 }
 
-// GetAllProjects list all the projects
 func (pc ProjectController) GetAllProjects(c *gin.Context) {
 	collection := pc.db.Collection("projects")
 	filter := bson.D{{}}
@@ -89,10 +85,9 @@ func (pc ProjectController) GetAllProjects(c *gin.Context) {
 
 	projects := models.ParseProjectsListBasicInfo(results)
 
-	c.JSON(200, gin.H{"data": projects})
+	c.JSON(200, projects)
 }
 
-// GetProject get project details
 func (pc ProjectController) GetProject(c *gin.Context) {
 	slug := c.Param("slug")
 
@@ -112,5 +107,5 @@ func (pc ProjectController) GetProject(c *gin.Context) {
 
 	projectData := result.ParseProjectDetails()
 
-	c.JSON(200, gin.H{"data": projectData})
+	c.JSON(200, projectData)
 }
